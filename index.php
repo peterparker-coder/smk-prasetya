@@ -1,6 +1,10 @@
 
 <?php
 require_once __DIR__ . '/config/koneksi.php';
+require_once __DIR__ . '/config/tracker.php';
+
+// Catat kunjungan pengunjung ke halaman beranda
+catat_pengunjung($conn, 'Beranda Utama');
 
 $pesan_status = "";
 
@@ -713,25 +717,37 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
         <!-- Notifikasi Pesan -->
         <?php if ($pesan_status == 'sukses') : ?>
 
-            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                Pesan berhasil dikirim dan tersimpan.
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-start border-success border-4 mb-4" id="alertPesanSukses">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill fs-3 me-3 text-success"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Pesan Anda Berhasil Terkirim!</h6>
+                        <p class="mb-0 small text-muted">Terima kasih telah menghubungi SMKS Prasetya Makassar. Pesan baru Anda telah diterima dan masuk ke panel notifikasi administrator sekolah.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const el = document.getElementById('alertPesanSukses');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            </script>
 
         <?php elseif ($pesan_status == 'gagal') : ?>
 
-            <div class="alert alert-danger alert-dismissible fade show rounded-3">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                Gagal menyimpan pesan. Silakan coba kembali.
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-start border-danger border-4 mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <strong>Gagal Mengirim Pesan:</strong> Terjadi gangguan saat menyimpan pesan Anda. Silakan coba kembali beberapa saat lagi.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
         <?php elseif ($pesan_status == 'kosong') : ?>
 
-            <div class="alert alert-warning alert-dismissible fade show rounded-3">
-                Mohon lengkapi seluruh formulir.
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-warning alert-dismissible fade show rounded-3 shadow-sm border-start border-warning border-4 mb-4">
+                <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                <strong>Formulir Belum Lengkap:</strong> Mohon lengkapi Nama, Email, Subjek, dan Isi Pesan sebelum mengirimkan formulir kontak.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
         <?php endif; ?>

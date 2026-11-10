@@ -10,6 +10,8 @@ $db   = "profil_smks_prasetya_makassar";
 // Koneksi database
 $conn = mysqli_connect($host, $user, $pass, $db);
 
+date_default_timezone_set('Asia/Makassar');
+
 if (!$conn) {
     die(
         "<div style='font-family:sans-serif;padding:25px;background:#ffeef0;color:#842029;border:1px solid #f5c2c7;border-radius:8px;margin:30px auto;max-width:650px;'>

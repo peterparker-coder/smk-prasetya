@@ -22,6 +22,14 @@ if (isset($_GET['action']) && $_GET['action'] == 'read' && isset($_GET['id'])) {
     exit;
 }
 
+// Proses tandai semua pesan sebagai sudah dibaca
+if (isset($_GET['action']) && $_GET['action'] == 'read_all') {
+    mysqli_query($conn, "UPDATE pesan SET status='sudah dibaca' WHERE status='belum dibaca'");
+
+    header("Location: index.php?status=sukses_baca_semua");
+    exit;
+}
+
 // Ambil semua pesan masuk dari yang terbaru
 $query = mysqli_query($conn, "SELECT * FROM pesan ORDER BY id DESC");
 
@@ -90,6 +98,13 @@ $query = mysqli_query($conn, "SELECT * FROM pesan ORDER BY id DESC");
 
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
+        <?php elseif (isset($_GET['status']) && $_GET['status'] == 'sukses_baca_semua') : ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check2-all me-1"></i>
+                Seluruh pesan berhasil ditandai sebagai sudah dibaca!
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         <?php endif; ?>
 
         <div class="card card-custom bg-white p-4">
@@ -105,6 +120,14 @@ $query = mysqli_query($conn, "SELECT * FROM pesan ORDER BY id DESC");
                         Daftar pertanyaan, aspirasi, dan pesan kontak dari pengunjung website profil sekolah
                     </p>
                 </div>
+
+                <?php if ($unread_count > 0) : ?>
+                    <a href="index.php?action=read_all" 
+                       class="btn btn-outline-success btn-sm fw-medium"
+                       onclick="return confirm('Tandai seluruh pesan baru sebagai sudah dibaca?');">
+                        <i class="bi bi-check2-all me-1"></i> Tandai Semua Sudah Dibaca
+                    </a>
+                <?php endif; ?>
             </div>
 
             <div class="table-responsive">

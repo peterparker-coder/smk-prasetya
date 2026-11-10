@@ -1,5 +1,6 @@
 <?php
-require_once 'config/koneksi.php';
+require_once __DIR__ . '/config/koneksi.php';
+require_once __DIR__ . '/config/tracker.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $query = mysqli_query($conn, "SELECT * FROM berita WHERE id = '$id' LIMIT 1");
@@ -10,6 +11,9 @@ if (!$query || mysqli_num_rows($query) == 0) {
 }
 
 $berita = mysqli_fetch_assoc($query);
+
+// Catat kunjungan ke artikel berita ini
+catat_pengunjung($conn, 'Berita: ' . ($berita['judul'] ?? 'Artikel'));
 
 // Berita lainnya untuk sidebar
 $q_lainnya = mysqli_query($conn, "SELECT * FROM berita WHERE id != '$id' ORDER BY tanggal DESC LIMIT 4");

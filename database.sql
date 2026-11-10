@@ -79,3 +79,54 @@ CREATE TABLE `pesan` (
 INSERT INTO `pesan` (`id`, `nama`, `email`, `subjek`, `pesan`, `status`) VALUES
 (1, 'Budi Santoso', 'budi.santoso@gmail.com', 'Informasi Biaya Pendaftaran PPDB', 'Selamat pagi bapak/ibu panitia, saya ingin menanyakan rincian biaya pendaftaran dan seragam untuk jurusan Rekayasa Perangkat Lunak. Terima kasih.', 'belum dibaca'),
 (2, 'Siti Nurhaliza', 'siti.nurhaliza@yahoo.com', 'Kerjasama Program Magang Siswa', 'Halo tim humas SMKS Prasetya, kami dari HRD Startup Makassar tertarik untuk menjalin kemitraan magang bagi siswa jurusan RPL dan TKJ. Mohon kontak person yang bisa dihubungi.', 'belum dibaca');
+
+-- --------------------------------------------------------
+-- 5. Struktur Tabel `pengunjung` (Statistik Pengunjung)
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `pengunjung`;
+CREATE TABLE `pengunjung` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `ip_address` VARCHAR(50) NOT NULL,
+  `user_agent` VARCHAR(255) DEFAULT NULL,
+  `halaman` VARCHAR(255) DEFAULT 'Beranda',
+  `tanggal` DATE NOT NULL,
+  `hits` INT DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX `idx_tanggal` (`tanggal`),
+  INDEX `idx_ip_tanggal` (`ip_address`, `tanggal`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `pengunjung` (`ip_address`, `user_agent`, `halaman`, `tanggal`, `hits`) VALUES
+('192.168.1.10', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 10 DAY), 4),
+('192.168.1.11', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 10 DAY), 2),
+('192.168.1.12', 'Mozilla/5.0 (Linux; Android 13; SM-A536B) Mobile', 'Detail Berita', DATE_SUB(CURDATE(), INTERVAL 10 DAY), 6),
+('192.168.1.13', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/120.0', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 9 DAY), 3),
+('192.168.1.14', 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X)', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 9 DAY), 5),
+('192.168.1.15', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', 'Jurusan', DATE_SUB(CURDATE(), INTERVAL 8 DAY), 7),
+('192.168.1.16', 'Mozilla/5.0 (Linux; Android 14; Pixel 7) Mobile', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 8 DAY), 4),
+('192.168.1.17', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Firefox/121.0', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 8 DAY), 2),
+('192.168.1.18', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', 'Galeri', DATE_SUB(CURDATE(), INTERVAL 7 DAY), 6),
+('192.168.1.19', 'Mozilla/5.0 (Linux; Android 13; Redmi Note 12)', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 7 DAY), 3),
+('192.168.1.20', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/120.0', 'Detail Berita', DATE_SUB(CURDATE(), INTERVAL 6 DAY), 8),
+('192.168.1.21', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 6 DAY), 5),
+('192.168.1.22', 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 6 DAY), 2),
+('192.168.1.23', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', 'Kontak', DATE_SUB(CURDATE(), INTERVAL 5 DAY), 4),
+('192.168.1.24', 'Mozilla/5.0 (Linux; Android 14; Samsung Galaxy S23)', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 5 DAY), 6),
+('192.168.1.25', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 4 DAY), 9),
+('192.168.1.26', 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X)', 'Jurusan', DATE_SUB(CURDATE(), INTERVAL 4 DAY), 3),
+('192.168.1.27', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Firefox/121.0', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 4 DAY), 5),
+('192.168.1.28', 'Mozilla/5.0 (Linux; Android 13; Vivo Y35)', 'Detail Berita', DATE_SUB(CURDATE(), INTERVAL 3 DAY), 7),
+('192.168.1.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 3 DAY), 4),
+('192.168.1.30', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 3 DAY), 2),
+('192.168.1.31', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/120.0', 'Galeri', DATE_SUB(CURDATE(), INTERVAL 2 DAY), 6),
+('192.168.1.32', 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X)', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 2 DAY), 8),
+('192.168.1.33', 'Mozilla/5.0 (Linux; Android 14; Oppo Reno 10)', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 2 DAY), 4),
+('192.168.1.34', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', 'Detail Berita', DATE_SUB(CURDATE(), INTERVAL 1 DAY), 10),
+('192.168.1.35', 'Mozilla/5.0 (Linux; Android 13; Realme 11)', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 1 DAY), 5),
+('192.168.1.36', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1', 'Beranda', DATE_SUB(CURDATE(), INTERVAL 1 DAY), 3),
+('192.168.1.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Firefox/121.0', 'Kontak', DATE_SUB(CURDATE(), INTERVAL 1 DAY), 4),
+('127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', 'Beranda', CURDATE(), 5),
+('192.168.1.50', 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)', 'Beranda', CURDATE(), 3),
+('192.168.1.51', 'Mozilla/5.0 (Linux; Android 14; Pixel 8)', 'Detail Berita', CURDATE(), 4),
+('192.168.1.52', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/120.0', 'Jurusan', CURDATE(), 2);
