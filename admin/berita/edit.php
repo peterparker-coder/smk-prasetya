@@ -53,6 +53,7 @@ if (isset($_POST['update'])) {
         $gambar_nama = $row['gambar'];
         $gambar_lama = $row['gambar'];
         $gambar_baru = false;
+        $destination = '';
 
         // Proses gambar jika pengguna memilih file baru
         if (
@@ -72,8 +73,13 @@ if (isset($_POST['update'])) {
                 $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
 
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mime_type = finfo_file($finfo, $file_tmp);
-                finfo_close($finfo);
+                $mime_type = $finfo
+                    ? finfo_file($finfo, $file_tmp)
+                    : false;
+
+                if ($finfo) {
+                    finfo_close($finfo);
+                }
 
                 $allowed_mime = [
                     'image/jpeg',
@@ -140,10 +146,7 @@ if (isset($_POST['update'])) {
                 mysqli_stmt_close($update);
 
                 // Hapus gambar lama setelah database berhasil diperbarui
-                if (
-                    $gambar_baru &&
-                    !empty($gambar_lama)
-                ) {
+                if ($gambar_baru && !empty($gambar_lama)) {
                     $old_file = "../../assets/uploads/" . basename($gambar_lama);
 
                     if (is_file($old_file)) {
@@ -160,7 +163,11 @@ if (isset($_POST['update'])) {
                 mysqli_stmt_close($update);
 
                 // Hapus gambar baru jika database gagal diperbarui
-                if ($gambar_baru && is_file($destination)) {
+                if (
+                    $gambar_baru &&
+                    !empty($destination) &&
+                    is_file($destination)
+                ) {
                     unlink($destination);
                 }
             }

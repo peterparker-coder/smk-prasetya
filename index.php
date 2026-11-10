@@ -36,6 +36,10 @@ $q_jurusan = mysqli_query($conn, "SELECT * FROM jurusan ORDER BY id ASC");
 
 // Ambil berita terbaru
 $q_berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal DESC LIMIT 6");
+
+// Ambil galeri terbaru
+$q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6");
+
 ?>
 
 <!DOCTYPE html>
@@ -159,6 +163,31 @@ $q_berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal DESC LIMI
             font-size: 30px;
             color: var(--primary-color);
         }
+
+        .card-galeri {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.card-galeri:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+}
+
+.card-galeri img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.card-galeri:hover img {
+    transform: scale(1.04);
+}
     </style>
 </head>
 
@@ -219,6 +248,10 @@ $q_berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal DESC LIMI
 
                 <li class="nav-item">
                     <a class="nav-link" href="#berita">Berita</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#galeri">Galeri</a>
                 </li>
 
                 <li class="nav-item">
@@ -564,6 +597,65 @@ $q_berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal DESC LIMI
     </div>
 </section>
 
+<!-- Galeri Sekolah -->
+<section class="py-5 bg-white" id="galeri">
+    <div class="container py-4">
+
+        <div class="section-title text-center">
+            <span class="text-primary fw-semibold small text-uppercase">
+                Dokumentasi Sekolah
+            </span>
+
+            <h2 class="fw-bold">Galeri SMKS Prasetya Makassar</h2>
+            <div class="divider"></div>
+
+            <p class="text-muted mt-2">
+                Dokumentasi kegiatan dan aktivitas SMKS Prasetya Makassar.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <?php if ($q_galeri && mysqli_num_rows($q_galeri) > 0) : ?>
+
+                <?php while ($g = mysqli_fetch_assoc($q_galeri)) : ?>
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card card-galeri">
+
+                            <img
+                                src="assets/uploads/<?= htmlspecialchars($g['nama_file']); ?>"
+                                alt="<?= htmlspecialchars($g['judul']); ?>"
+                                onerror="this.src='https://placehold.co/600x400?text=Galeri+Sekolah'">
+
+                            <div class="card-body p-3">
+                                <h5 class="fw-bold text-dark mb-2">
+                                    <?= htmlspecialchars($g['judul']); ?>
+                                </h5>
+
+                                <p class="text-secondary small mb-0">
+                                    <?= htmlspecialchars($g['deskripsi'] ?? 'Dokumentasi kegiatan sekolah.'); ?>
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                <?php endwhile; ?>
+
+            <?php else : ?>
+
+                <div class="col-12 text-center py-5 text-muted">
+                    <i class="bi bi-images fs-1 d-block mb-2"></i>
+                    <p>Belum ada dokumentasi galeri.</p>
+                </div>
+
+            <?php endif; ?>
+
+        </div>
+    </div>
+</section>
+
 <!-- Kontak -->
 <section class="py-5 bg-white" id="kontak">
     <div class="container py-4">
@@ -819,6 +911,10 @@ $q_berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal DESC LIMI
 
                     <li class="mb-2">
                         <a href="#berita" class="text-white-50 text-decoration-none">Berita</a>
+                    </li>
+
+                    <li class="mb-2">
+                        <a href="#galeri" class="text-white-50 text-decoration-none">Galeri</a>
                     </li>
 
                     <li class="mb-2">
