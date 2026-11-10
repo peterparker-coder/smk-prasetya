@@ -2,7 +2,7 @@
 <?php
 session_start();
 
-require_once 'config/koneksi.php';
+require_once __DIR__ . '/config/koneksi.php';
 
 // Jika sudah login, arahkan ke dashboard
 if (

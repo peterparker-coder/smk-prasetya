@@ -1,6 +1,6 @@
 
 <?php
-require_once 'config/koneksi.php';
+require_once __DIR__ . '/config/koneksi.php';
 
 $pesan_status = "";
 
@@ -39,7 +39,6 @@ $q_berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal DESC LIMI
 
 // Ambil galeri terbaru
 $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6");
-
 ?>
 
 <!DOCTYPE html>
@@ -165,30 +164,58 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
         }
 
         .card-galeri {
-    border: none;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-    height: 100%;
-    transition: all 0.3s ease;
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .card-galeri:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+        }
+
+        .card-galeri img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .card-galeri:hover img {
+            transform: scale(1.04);
+        }
+
+        .navbar-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    margin-right: 10px;
 }
 
-.card-galeri:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+.navbar-brand span {
+    font-size: 16px;
 }
 
-.card-galeri img {
-    width: 100%;
-    height: 240px;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-}
+@media (max-width: 576px) {
+    .navbar-logo {
+        width: 40px;
+        height: 40px;
+    }
 
-.card-galeri:hover img {
-    transform: scale(1.04);
+    .navbar-brand span {
+        font-size: 13px;
+    }
 }
     </style>
+
+    <!-- CSS Tema -->
+    <link rel="stylesheet" href="assets/css/theme.css">
+
+    <!-- JavaScript Tema -->
+    <script src="assets/js/theme.js"></script>
 </head>
 
 <body>
@@ -222,7 +249,11 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
     <div class="container">
 
         <a class="navbar-brand d-flex align-items-center fw-bold" href="#beranda">
-            <i class="bi bi-mortarboard-fill text-warning me-2 fs-3"></i>
+            <img
+                src="assets/uploads/logo-smks-prasetya.png"
+                alt="Logo SMKS Prasetya Makassar"
+                class="navbar-logo">
+
             <span>SMKS PRASETYA MAKASSAR</span>
         </a>
 
@@ -232,6 +263,13 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
         </button>
 
         <div class="collapse navbar-collapse justify-content-end" id="mainNav">
+
+            <!-- Tombol Dark Mode -->
+            <button type="button"
+                    id="themeToggle"
+                    class="btn btn-outline-light btn-sm me-3 mb-2 mb-lg-0">
+                <i class="bi bi-moon-stars-fill me-1"></i> Dark Mode
+            </button>
 
             <ul class="navbar-nav me-3 mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -565,10 +603,9 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
                                     <?= htmlspecialchars($b['judul'] ?? ''); ?>
                                 </h5>
 
-                                <p class="text-secondary small flex-grow-1"
-                                   style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">
-                                    <?= htmlspecialchars(strip_tags($b['isi'] ?? '')); ?>
-                                </p>
+                              <p class="text-secondary small flex-grow-1"
+                                style="display:-webkit-box;line-clamp:3;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">
+                              </p>
 
                                 <div class="mt-3 pt-3 border-top">
                                     <a href="detail-berita.php?id=<?= (int)$b['id']; ?>"

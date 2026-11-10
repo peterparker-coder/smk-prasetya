@@ -7,7 +7,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-require_once '../../config/koneksi.php';
+require_once __DIR__ . '/../../config/koneksi.php';
 
 $active_menu = 'galeri';
 $base_admin = '../';

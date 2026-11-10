@@ -10,7 +10,7 @@ if (
     exit;
 }
 
-require_once '../../config/koneksi.php';
+require_once __DIR__ . '/../../config/koneksi.php';
 
 $active_menu = 'berita';
 $base_admin = '../';
