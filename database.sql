@@ -130,3 +130,76 @@ INSERT INTO `pengunjung` (`ip_address`, `user_agent`, `halaman`, `tanggal`, `hit
 ('192.168.1.50', 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)', 'Beranda', CURDATE(), 3),
 ('192.168.1.51', 'Mozilla/5.0 (Linux; Android 14; Pixel 8)', 'Detail Berita', CURDATE(), 4),
 ('192.168.1.52', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/120.0', 'Jurusan', CURDATE(), 2);
+
+-- --------------------------------------------------------
+-- 6. Struktur Tabel `guru` (Guru dan Tenaga Kependidikan)
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `guru`;
+CREATE TABLE `guru` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nama` VARCHAR(150) NOT NULL,
+  `jabatan` VARCHAR(150) NOT NULL,
+  `kategori` VARCHAR(50) DEFAULT 'Guru',
+  `deskripsi` TEXT DEFAULT NULL,
+  `foto` VARCHAR(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `guru` (`id`, `nama`, `jabatan`, `kategori`, `deskripsi`, `foto`) VALUES
+(1, 'Rizkiani Razak', 'Kepala Sekolah', 'Tenaga Kependidikan', 'Memimpin dan mengelola SMKS Prasetya Makassar dengan integritas, berfokus pada pengembangan mutu pendidikan kejuruan dan karakter peserta didik yang adaptif terhadap dunia kerja.', 'guru-rizkiani.png'),
+(2, 'Ir. Muhammad Arifin, S.Kom., M.T.', 'Guru Produktif TKJ & Kepala Lab Jaringan', 'Guru', 'Membimbing siswa dalam penguasaan infrastruktur jaringan LAN/WAN, routing Mikrotik, fiber optic, administrasi server Linux, serta keamanan sistem informasi.', 'guru-arifin.png'),
+(3, 'Nurul Fadilah, S.Kom., M.Cs.', 'Guru Produktif RPL & Pembina Coding Club', 'Guru', 'Fasilitator pengembangan aplikasi web modern, pemrograman berorientasi objek, perancangan basis data relasional, dan mobile application development.', 'guru-nurul.png'),
+(4, 'Dra. Hj. Ratnawati, M.Pd.', 'Guru Otomatisasi & Tata Kelola Perkantoran (OTKP)', 'Guru', 'Pengajar spesialis korespondensi digital, manajemen kearsipan elektronik, otomatisasi perkantoran modern, dan public relations keprotokolan.', 'guru-ratnawati.png'),
+(5, 'Andi Samsul Alam, S.E., M.Ak.', 'Guru Akuntansi & Keuangan Lembaga (AKL)', 'Guru', 'Membekali peserta didik dengan pemahaman pembukuan keuangan, siklus akuntansi perusahaan dagang dan manufaktur, serta aplikasi software akuntansi.', 'guru-samsul.png'),
+(6, 'Hasanuddin, S.T.', 'Guru Teknik & Bisnis Sepeda Motor (TBSM)', 'Guru', 'Instruktur praktik teknologi otomotif roda dua, pemeliharaan mesin injeksi bahan bakar (EFI), sistem transmisi, dan manajemen bengkel kerja.', 'guru-hasanuddin.png'),
+(7, 'Syahrul Ramadhan, S.AP.', 'Kepala Tata Usaha (KTU)', 'Tenaga Kependidikan', 'Mengkoordinasikan pelayanan administrasi umum, administrasi kepegawaian, sarana prasarana sekolah, dan legalitas surat menyurat resmi.', 'guru-syahrul.png'),
+(8, 'Sri Wahyuni, S.I.Pust.', 'Kepala Perpustakaan Sekolah', 'Tenaga Kependidikan', 'Mengembangkan sistem otomasi perpustakaan sekolah, repositori e-book digital, serta gerakan literasi membaca bagi warga SMKS Prasetya Makassar.', 'guru-wahyuni.png');
+
+-- --------------------------------------------------------
+-- 7. Struktur Tabel `fasilitas` (Fasilitas & Sarana Prasarana Sekolah)
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `fasilitas`;
+CREATE TABLE `fasilitas` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nama_fasilitas` VARCHAR(150) NOT NULL,
+  `kategori` VARCHAR(100) NOT NULL DEFAULT 'Umum',
+  `deskripsi` TEXT DEFAULT NULL,
+  `foto` VARCHAR(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `fasilitas` (`id`, `nama_fasilitas`, `kategori`, `deskripsi`, `foto`) VALUES
+(1, 'Laboratorium Komputer & Jaringan (TKJ & RPL)', 'Laboratorium & Praktik', 'Dilengkapi komputer spesifikasi modern, router Mikrotik, switch Cisco, perangkat fiber optic, dan koneksi internet dedicated untuk praktikum routing, server, dan software development.', 'fasilitas-lab-komputer.png'),
+(2, 'Bengkel Praktik Teknik Sepeda Motor (TBSM)', 'Laboratorium & Praktik', 'Ruang praktikum mekanik otomotif standar industri yang dilengkapi unit motor injeksi (EFI), engine stand, bike lift pneumatik, dan special service tools (SST) terstandar.', 'fasilitas-bengkel-tbsm.png'),
+(3, 'Lab Simulasi Perkantoran & Mini Bank', 'Laboratorium & Praktik', 'Fasilitas simulasi tata kelola administrasi perkantoran modern (OTKP) dan perbankan/akuntansi (AKL) dengan perlengkapan kearsipan digital, cash register, dan software akuntansi.', 'fasilitas-lab-perkantoran.png'),
+(4, 'Perpustakaan & Digital Learning Center', 'Ruang Pembelajaran', 'Pusat literasi sekolah yang menyediakan ribuan koleksi buku kejuruan, ensiklopedia, ruang baca ber-AC, serta komputer akses e-book digital untuk riset siswa.', 'fasilitas-perpustakaan.png'),
+(5, 'Ruang Kelas Multimedia Ber-AC', 'Ruang Pembelajaran', 'Ruang belajar teori yang nyaman dilengkapi proyektor LCD interaktif, pendingin ruangan (AC), pencahayaan ergonomis, dan akses Wi-Fi sekolah.', 'fasilitas-ruang-kelas.png'),
+(6, 'Lapangan Olahraga Serbaguna', 'Sarana Olahraga', 'Sarana outdoor multifungsi untuk kegiatan olahraga futsal, basket, voli, dan bulutangkis, serta pelaksanaan upacara bendera dan kegiatan ekstrakurikuler.', 'fasilitas-lapangan-olahraga.png'),
+(7, 'Musholla Sekolah Baitul Ilmi', 'Fasilitas Penunjang', 'Tempat ibadah yang bersih dan sejuk untuk pelaksanaan ibadah shalat berjamaah, kajian keagamaan rutin, dan pembinaan karakter spiritual peserta didik.', 'fasilitas-musholla.png'),
+(8, 'Ruang Unit Kesehatan Sekolah (UKS)', 'Fasilitas Penunjang', 'Layanan kesehatan pertama bagi warga sekolah yang dilengkapi ranjang pasien, kotak P3K lengkap, tensimeter, dan pendampingan kader Palang Merah Remaja (PMR).', 'fasilitas-uks.png');
+
+-- --------------------------------------------------------
+-- 8. Struktur Tabel `alumni` (Jejak Alumni SMKS Prasetya)
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `alumni`;
+CREATE TABLE `alumni` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nama` VARCHAR(150) NOT NULL,
+  `tahun_lulus` VARCHAR(10) NOT NULL,
+  `jurusan` VARCHAR(100) NOT NULL,
+  `pekerjaan` VARCHAR(255) NOT NULL,
+  `aktivitas` VARCHAR(255) DEFAULT NULL,
+  `testimoni` TEXT DEFAULT NULL,
+  `foto` VARCHAR(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `alumni` (`id`, `nama`, `tahun_lulus`, `jurusan`, `pekerjaan`, `aktivitas`, `testimoni`, `foto`) VALUES
+(1, 'Ahmad Fadhil Pratama', '2022', 'Teknik Komputer dan Jaringan (TKJ)', 'Network Engineer di PT Telkom Akses Makassar', 'Bekerja sebagai Network Engineer di PT Telkom Akses', 'Bekal praktikum jaringan fiber optic dan konfigurasi Mikrotik di SMKS Prasetya sangat relevan dengan kebutuhan industri telekomunikasi saat ini.', 'alumni-fadhil.png'),
+(2, 'Siti Rahmawati', '2021', 'Rekayasa Perangkat Lunak (RPL)', 'Frontend Web Developer di Solusi Digital Nusantara', 'Bekerja di Startup Teknologi & Freelancer UI/UX', 'Bimbingan guru-guru RPL membuat saya terbiasa coding sejak dini, hingga langsung dipercaya menjadi developer profesional setelah lulus.', 'alumni-rahma.png'),
+(3, 'Muhammad Fauzan', '2023', 'Teknik & Bisnis Sepeda Motor (TBSM)', 'Kepala Mekanik di Bengkel Resmi Honda AHASS Makassar', 'Bekerja di Bengkel Resmi & Wirausaha Bengkel Motor', 'Peralatan bengkel sekolah yang lengkap dengan unit motor injeksi membuat saya langsung siap terjun ke bengkel resmi tanpa canggung.', 'alumni-fauzan.png'),
+(4, 'Nur Annisa Putri', '2020', 'Otomatisasi & Tata Kelola Perkantoran (OTKP)', 'Staf Administrasi & Kesekretariatan di BUMN Makassar', 'Bekerja di BUMN & Kuliah Kelas Karyawan', 'Pelatihan kearsipan elektronik dan korespondensi bisnis di SMKS Prasetya sangat membantu karier administrasi saya berkembang pesat.', 'alumni-annisa.png'),
+(5, 'Rahmat Hidayat', '2022', 'Akuntansi dan Keuangan Lembaga (AKL)', 'Staf Accounting & Tax di Kantor Akuntan Publik', 'Bekerja di KAP & Mahasiswa Akuntansi UNHAS', 'Pembelajaran software akuntansi komputer dan perpajakan di sekolah menjadi modal kuat saya bersaing di dunia kerja profesional.', 'alumni-rahmat.png'),
+(6, 'Dian Maharani', '2021', 'Rekayasa Perangkat Lunak (RPL)', 'Mobile Apps Developer di FinTech Mandiri Makassar', 'Bekerja di Industri Finansial Digital', 'SMKS Prasetya memberi ruang eksplorasi coding yang luas dan mendukung portofolio karya aplikasi siswa.', 'alumni-dian.png'),
+(7, 'Ilham Saputra', '2023', 'Teknik Komputer dan Jaringan (TKJ)', 'IT Support & SysAdmin di Rumah Sakit Siloam Makassar', 'Bekerja di Bidang Health-Tech Infrastructure', 'Keahlian troubleshooting hardware dan server yang saya pelajari sangat aplikatif di dunia kerja nyata.', 'alumni-ilham.png'),
+(8, 'Putri Ayu Lestari', '2020', 'Otomatisasi & Tata Kelola Perkantoran (OTKP)', 'Public Relations & Customer Service di Hotel Makassar', 'Bekerja di Industri Perhotelan & Hospitality', 'Pendidikan etika profesi dan public speaking di Prasetya membentuk rasa percaya diri saya dalam berkomunikasi dan melayani klien.', 'alumni-putri.png');
+
+
+

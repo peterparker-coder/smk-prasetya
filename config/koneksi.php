@@ -1,4 +1,3 @@
-
 <?php
 // Konfigurasi Database SMKS Prasetya Makassar
 

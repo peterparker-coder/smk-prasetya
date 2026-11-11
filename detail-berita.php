@@ -1,9 +1,13 @@
 <?php
 require_once __DIR__ . '/config/koneksi.php';
 require_once __DIR__ . '/config/tracker.php';
+require_once __DIR__ . '/config/seo.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$query = mysqli_query($conn, "SELECT * FROM berita WHERE id = '$id' LIMIT 1");
+$stmt_b = mysqli_prepare($conn, "SELECT * FROM berita WHERE id = ? LIMIT 1");
+mysqli_stmt_bind_param($stmt_b, "i", $id);
+mysqli_stmt_execute($stmt_b);
+$query = mysqli_stmt_get_result($stmt_b);
 
 if (!$query || mysqli_num_rows($query) == 0) {
     header("Location: index.php#berita");
@@ -11,31 +15,65 @@ if (!$query || mysqli_num_rows($query) == 0) {
 }
 
 $berita = mysqli_fetch_assoc($query);
+mysqli_stmt_close($stmt_b);
 
 // Catat kunjungan ke artikel berita ini
 catat_pengunjung($conn, 'Berita: ' . ($berita['judul'] ?? 'Artikel'));
 
 // Berita lainnya untuk sidebar
-$q_lainnya = mysqli_query($conn, "SELECT * FROM berita WHERE id != '$id' ORDER BY tanggal DESC LIMIT 4");
+$stmt_lain = mysqli_prepare($conn, "SELECT * FROM berita WHERE id != ? ORDER BY tanggal DESC LIMIT 4");
+mysqli_stmt_bind_param($stmt_lain, "i", $id);
+mysqli_stmt_execute($stmt_lain);
+$q_lainnya = mysqli_stmt_get_result($stmt_lain);
+
+// Ringkasan untuk meta deskripsi
+$snippet_desc = mb_substr(preg_replace('/\s+/', ' ', strip_tags($berita['isi'] ?? '')), 0, 160);
+$news_image = (!empty($berita['gambar']) && file_exists(__DIR__ . '/assets/uploads/' . $berita['gambar']))
+    ? 'assets/uploads/' . $berita['gambar']
+    : 'assets/uploads/logo-smks-prasetya.png';
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($berita['judul']); ?> - SMKS Prasetya Makassar</title>
+
+    <?php
+    render_seo_tags([
+        'title'       => $berita['judul'] . ' - SMKS Prasetya Makassar',
+        'description' => $snippet_desc,
+        'keywords'    => 'Berita SMKS Prasetya Makassar, Informasi Sekolah SMK Makassar, Kegiatan SMK Prasetya, ' . $berita['judul'],
+        'author'      => !empty($berita['penulis']) ? $berita['penulis'] : 'Humas SMKS Prasetya Makassar',
+        'type'        => 'article',
+        'image'       => $news_image,
+    ]);
+    render_article_schema($berita);
+    render_breadcrumb_schema([
+        'Beranda' => 'index.php',
+        'Berita'  => 'index.php#berita',
+        $berita['judul'] => 'detail-berita.php?id=' . $id
+    ]);
+    ?>
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Google Fonts Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS Tema Terang / Gelap -->
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <!-- JavaScript Tema -->
+    <script src="assets/js/theme.js"></script>
+
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; color: #334155; }
         .navbar-brand span { font-size: 1.25rem; font-weight: 700; }
         .article-content { line-height: 1.8; font-size: 1.05rem; white-space: pre-line; }
         .hero-article-img { max-height: 450px; width: 100%; object-fit: cover; border-radius: 12px; }
         .sidebar-card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .navbar-logo { width: 44px; height: 44px; object-fit: contain; margin-right: 10px; }
     </style>
 </head>
 <body>
@@ -43,23 +81,37 @@ $q_lainnya = mysqli_query($conn, "SELECT * FROM berita WHERE id != '$id' ORDER B
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm" style="background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="index.php">
-                <i class="bi bi-mortarboard-fill text-warning me-2 fs-3"></i>
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="index.php">
+                <img src="assets/uploads/logo-smks-prasetya.png"
+                     alt="Logo Resmi SMKS Prasetya Makassar"
+                     class="navbar-logo"
+                     width="44"
+                     height="44"
+                     decoding="async"
+                     onerror="this.src='https://placehold.co/50x50?text=SMKS'">
                 <span>SMKS PRASETYA MAKASSAR</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarMain">
+                <!-- Tombol Dark Mode -->
+                <button type="button" id="themeToggle" class="btn btn-outline-light btn-sm me-3 mb-2 mb-lg-0">
+                    <i class="bi bi-moon-stars-fill me-1"></i> Dark Mode
+                </button>
+
                 <ul class="navbar-nav me-3">
                     <li class="nav-item"><a class="nav-link" href="index.php">Beranda</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php#profil">Profil</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php#jurusan">Jurusan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="guru.php">Guru & Tendik</a></li>
+                    <li class="nav-item"><a class="nav-link" href="fasilitas.php">Fasilitas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="alumni.php">Alumni</a></li>
                     <li class="nav-item"><a class="nav-link active fw-semibold" href="index.php#berita">Berita</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php#kontak">Kontak</a></li>
                 </ul>
-                <a href="login.php" class="btn btn-outline-light btn-sm px-3 rounded-pill">
-                    <i class="bi bi-person-lock me-1"></i> Login Admin
+                <a href="login.php" class="btn btn-warning text-dark fw-bold btn-sm px-3 rounded-pill shadow-sm">
+                    <i class="bi bi-lock-fill me-1"></i> Login Admin
                 </a>
             </div>
         </div>
@@ -89,7 +141,11 @@ $q_lainnya = mysqli_query($conn, "SELECT * FROM berita WHERE id != '$id' ORDER B
                     </div>
 
                     <div class="mb-4">
-                        <img src="assets/uploads/<?= htmlspecialchars($berita['gambar']); ?>" alt="<?= htmlspecialchars($berita['judul']); ?>" class="hero-article-img shadow-sm" onerror="this.src='https://placehold.co/800x450?text=Gambar+Berita'">
+                        <img src="assets/uploads/<?= htmlspecialchars($berita['gambar']); ?>"
+                             alt="<?= htmlspecialchars($berita['judul']); ?> - Berita SMKS Prasetya Makassar"
+                             class="hero-article-img shadow-sm"
+                             decoding="async"
+                             onerror="this.src='https://placehold.co/800x450?text=Gambar+Berita'">
                     </div>
 
                     <article class="article-content text-secondary">
@@ -121,7 +177,14 @@ $q_lainnya = mysqli_query($conn, "SELECT * FROM berita WHERE id != '$id' ORDER B
                         <div class="d-flex flex-column gap-3">
                             <?php while ($bl = mysqli_fetch_assoc($q_lainnya)) : ?>
                                 <div class="d-flex gap-3 align-items-center">
-                                    <img src="assets/uploads/<?= htmlspecialchars($bl['gambar']); ?>" alt="thumbnail" class="rounded object-fit-cover flex-shrink-0" width="80" height="65" onerror="this.src='https://placehold.co/100x80?text=News'">
+                                    <img src="assets/uploads/<?= htmlspecialchars($bl['gambar']); ?>"
+                                         alt="<?= htmlspecialchars($bl['judul']); ?> - SMKS Prasetya Makassar"
+                                         class="rounded object-fit-cover flex-shrink-0"
+                                         width="80"
+                                         height="65"
+                                         loading="lazy"
+                                         decoding="async"
+                                         onerror="this.src='https://placehold.co/100x80?text=News'">
                                     <div>
                                         <small class="text-muted d-block" style="font-size: 11px;">
                                             <i class="bi bi-calendar3 me-1"></i><?= date('d M Y', strtotime($bl['tanggal'])); ?>
@@ -168,6 +231,9 @@ $q_lainnya = mysqli_query($conn, "SELECT * FROM berita WHERE id != '$id' ORDER B
                         <li class="mb-2"><a href="index.php" class="text-white-50 text-decoration-none">Beranda</a></li>
                         <li class="mb-2"><a href="index.php#profil" class="text-white-50 text-decoration-none">Profil & Visi Misi</a></li>
                         <li class="mb-2"><a href="index.php#jurusan" class="text-white-50 text-decoration-none">Program Keahlian</a></li>
+                        <li class="mb-2"><a href="guru.php" class="text-white-50 text-decoration-none">Guru & Tendik</a></li>
+                        <li class="mb-2"><a href="fasilitas.php" class="text-white-50 text-decoration-none">Fasilitas Sekolah</a></li>
+                        <li class="mb-2"><a href="alumni.php" class="text-white-50 text-decoration-none">Alumni</a></li>
                         <li class="mb-2"><a href="index.php#berita" class="text-white-50 text-decoration-none">Berita & Kegiatan</a></li>
                     </ul>
                 </div>

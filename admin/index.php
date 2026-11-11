@@ -111,8 +111,11 @@ while ($r = mysqli_fetch_assoc($q_riwayat)) {
 // -------------------------------------------------------------
 // 2. DATA STATISTIK KONTEN SEKOLAH
 // -------------------------------------------------------------
-$total_jurusan = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM jurusan"))['total'] ?? 0;
-$total_berita  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM berita"))['total'] ?? 0;
+$total_jurusan   = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM jurusan"))['total'] ?? 0;
+$total_guru      = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM guru"))['total'] ?? 0;
+$total_fasilitas = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM fasilitas"))['total'] ?? 0;
+$total_alumni    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM alumni"))['total'] ?? 0;
+$total_berita    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM berita"))['total'] ?? 0;
 $total_pesan   = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pesan"))['total'] ?? 0;
 $pesan_baru    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pesan WHERE status='belum dibaca'"))['total'] ?? 0;
 $total_admin   = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM admin"))['total'] ?? 0;
@@ -208,6 +211,15 @@ function format_tgl_indo($tanggal) {
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="#statistik-pengunjung" class="btn btn-info text-white fw-semibold shadow-sm">
                         <i class="bi bi-graph-up me-1"></i> Statistik Pengunjung
+                    </a>
+                    <a href="guru/index.php" class="btn btn-light fw-semibold shadow-sm text-primary">
+                        <i class="bi bi-people me-1"></i> Guru & Tendik
+                    </a>
+                    <a href="fasilitas/index.php" class="btn btn-light fw-semibold shadow-sm text-dark">
+                        <i class="bi bi-building me-1"></i> Fasilitas
+                    </a>
+                    <a href="alumni/index.php" class="btn btn-light fw-semibold shadow-sm text-primary">
+                        <i class="bi bi-mortarboard me-1"></i> Alumni
                     </a>
                     <a href="berita/tambah.php" class="btn btn-warning fw-semibold shadow-sm text-dark">
                         <i class="bi bi-plus-circle me-1"></i> Buat Berita
@@ -395,7 +407,7 @@ function format_tgl_indo($tanggal) {
         <div class="row g-3 mb-4">
             <!-- Stat Jurusan -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card stat-card bg-white p-3 shadow-sm">
+                <div class="card stat-card bg-white p-3 shadow-sm h-100">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <span class="text-muted small fw-semibold text-uppercase">Program Jurusan</span>
@@ -413,9 +425,69 @@ function format_tgl_indo($tanggal) {
                 </div>
             </div>
 
+            <!-- Stat Guru & Tendik -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card stat-card bg-white p-3 shadow-sm h-100">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold text-uppercase">Guru & Tendik</span>
+                            <h2 class="fw-bold mb-0 text-dark"><?= $total_guru; ?></h2>
+                        </div>
+                        <div class="stat-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-top">
+                        <a href="guru/index.php" class="small text-decoration-none text-warning fw-medium">
+                            Kelola Guru & Tendik &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat Fasilitas -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card stat-card bg-white p-3 shadow-sm h-100">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold text-uppercase">Fasilitas Sekolah</span>
+                            <h2 class="fw-bold mb-0 text-dark"><?= $total_fasilitas; ?></h2>
+                        </div>
+                        <div class="stat-icon bg-secondary-subtle text-secondary">
+                            <i class="bi bi-building"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-top">
+                        <a href="fasilitas/index.php" class="small text-decoration-none text-secondary fw-medium">
+                            Kelola Fasilitas &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat Alumni -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card stat-card bg-white p-3 shadow-sm h-100">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold text-uppercase">Data Alumni</span>
+                            <h2 class="fw-bold mb-0 text-dark"><?= $total_alumni; ?></h2>
+                        </div>
+                        <div class="stat-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-top">
+                        <a href="alumni/index.php" class="small text-decoration-none text-primary fw-medium">
+                            Kelola Alumni &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Stat Berita -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card stat-card bg-white p-3 shadow-sm">
+                <div class="card stat-card bg-white p-3 shadow-sm h-100">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <span class="text-muted small fw-semibold text-uppercase">Total Berita</span>

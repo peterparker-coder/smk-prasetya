@@ -2,6 +2,7 @@
 <?php
 require_once __DIR__ . '/config/koneksi.php';
 require_once __DIR__ . '/config/tracker.php';
+require_once __DIR__ . '/config/seo.php';
 
 // Catat kunjungan pengunjung ke halaman beranda
 catat_pengunjung($conn, 'Beranda Utama');
@@ -38,6 +39,40 @@ if (isset($_POST['kirim_pesan'])) {
 // Ambil data jurusan
 $q_jurusan = mysqli_query($conn, "SELECT * FROM jurusan ORDER BY id ASC");
 
+// Ambil data guru & tenaga kependidikan menggunakan prepared statement (tanpa mengasumsikan kolom created_at)
+$q_guru = null;
+$stmt_guru_home = mysqli_prepare($conn, "SELECT id, nama, jabatan, kategori, deskripsi, foto FROM guru ORDER BY id ASC LIMIT 8");
+if ($stmt_guru_home) {
+    mysqli_stmt_execute($stmt_guru_home);
+    $q_guru = mysqli_stmt_get_result($stmt_guru_home);
+}
+
+// Ambil data fasilitas sekolah menggunakan prepared statement (Ketentuan 13)
+$col_nama_fas = 'nama_fasilitas';
+$check_col_fas = mysqli_query($conn, "SHOW COLUMNS FROM fasilitas LIKE 'nama_fasilitas'");
+if (!$check_col_fas || mysqli_num_rows($check_col_fas) == 0) {
+    $col_nama_fas = 'nama';
+}
+$q_fasilitas = null;
+$stmt_fas_home = mysqli_prepare($conn, "SELECT id, $col_nama_fas AS nama_fasilitas, kategori, deskripsi, foto FROM fasilitas ORDER BY id ASC LIMIT 6");
+if ($stmt_fas_home) {
+    mysqli_stmt_execute($stmt_fas_home);
+    $q_fasilitas = mysqli_stmt_get_result($stmt_fas_home);
+}
+
+// Ambil data alumni sekolah menggunakan prepared statement (Ketentuan: prepared statement & periksa kolom)
+$col_pekerjaan_home = 'pekerjaan';
+$check_col_pek = mysqli_query($conn, "SHOW COLUMNS FROM alumni LIKE 'pekerjaan'");
+if (!$check_col_pek || mysqli_num_rows($check_col_pek) == 0) {
+    $col_pekerjaan_home = 'aktivitas';
+}
+$q_alumni = null;
+$stmt_alumni_home = mysqli_prepare($conn, "SELECT id, nama, tahun_lulus, jurusan, $col_pekerjaan_home AS pekerjaan, foto, testimoni FROM alumni ORDER BY id DESC LIMIT 4");
+if ($stmt_alumni_home) {
+    mysqli_stmt_execute($stmt_alumni_home);
+    $q_alumni = mysqli_stmt_get_result($stmt_alumni_home);
+}
+
 // Ambil berita terbaru
 $q_berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal DESC LIMIT 6");
 
@@ -51,7 +86,16 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SMKS Prasetya Makassar</title>
+    <?php
+    render_seo_tags([
+        'title'       => 'SMKS Prasetya Makassar - Sekolah Menengah Kejuruan Unggul di Makassar',
+        'description' => 'Website resmi SMKS Prasetya Makassar. Sekolah Menengah Kejuruan swasta terakreditasi di Tamalanrea, Makassar dengan program keahlian TKJ, RPL, TBSM, OTKP, dan AKL siap kerja.',
+        'keywords'    => 'SMKS Prasetya Makassar, SMK Prasetya, SMK Makassar, SMK Tamalanrea, PPDB SMKS Prasetya, Jurusan RPL Makassar, Jurusan TKJ Makassar, TBSM Makassar, Sekolah Kejuruan Makassar',
+        'type'        => 'website',
+        'image'       => 'assets/uploads/logo-smks-prasetya.png',
+    ]);
+    render_school_schema();
+    ?>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -192,6 +236,20 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
             transform: scale(1.04);
         }
 
+        .card-alumni {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .card-alumni:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 30px rgba(30,60,114,0.12);
+        }
+
         .navbar-logo {
     width: 48px;
     height: 48px;
@@ -255,8 +313,11 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
         <a class="navbar-brand d-flex align-items-center fw-bold" href="#beranda">
             <img
                 src="assets/uploads/logo-smks-prasetya.png"
-                alt="Logo SMKS Prasetya Makassar"
-                class="navbar-logo">
+                alt="Logo Resmi SMKS Prasetya Makassar"
+                class="navbar-logo"
+                width="48"
+                height="48"
+                decoding="async">
 
             <span>SMKS PRASETYA MAKASSAR</span>
         </a>
@@ -286,6 +347,18 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
 
                 <li class="nav-item">
                     <a class="nav-link" href="#jurusan">Jurusan</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#guru">Guru & Tendik</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#fasilitas">Fasilitas</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#alumni">Alumni</a>
                 </li>
 
                 <li class="nav-item">
@@ -556,6 +629,226 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
     </div>
 </section>
 
+<!-- Guru & Tenaga Kependidikan -->
+<section class="py-5 bg-white border-top" id="guru">
+    <div class="container py-4">
+
+        <div class="section-title text-center">
+            <span class="text-primary fw-semibold small text-uppercase">
+                Pendidik & Tenaga Kependidikan
+            </span>
+
+            <h2 class="fw-bold">Guru & Tenaga Kependidikan</h2>
+            <div class="divider"></div>
+
+            <p class="text-muted mt-2">
+                Mengenal jajaran guru dan tenaga kependidikan SMKS Prasetya Makassar.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <?php if ($q_guru && mysqli_num_rows($q_guru) > 0) : ?>
+                <?php while ($g = mysqli_fetch_assoc($q_guru)) : 
+                    $g_foto = $g['foto'] ?? '';
+                    $g_src = (!empty($g_foto) && file_exists(__DIR__ . '/assets/uploads/' . $g_foto))
+                        ? 'assets/uploads/' . htmlspecialchars($g_foto)
+                        : 'https://placehold.co/400x450?text=' . urlencode(substr($g['nama'], 0, 2));
+                    $is_tendik = (($g['kategori'] ?? '') === 'Tenaga Kependidikan');
+                ?>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card card-guru h-100">
+                            <div class="guru-img-wrapper position-relative" style="height: 250px; overflow: hidden; background: #f1f5f9;">
+                                <img src="<?= $g_src; ?>"
+                                     alt="Foto <?= htmlspecialchars($g['nama']); ?> - Pendidik SMKS Prasetya Makassar"
+                                     class="w-100 h-100 object-fit-cover"
+                                     loading="lazy"
+                                     decoding="async"
+                                     onerror="this.src='https://placehold.co/400x450?text=Foto+Guru'">
+                                <?php if ($is_tendik) : ?>
+                                    <span class="position-absolute top-0 end-0 m-3 badge bg-info text-white shadow-sm rounded-pill px-3 py-1 small">
+                                        <i class="bi bi-person-badge me-1"></i> Tendik
+                                    </span>
+                                <?php else : ?>
+                                    <span class="position-absolute top-0 end-0 m-3 badge bg-success text-white shadow-sm rounded-pill px-3 py-1 small">
+                                        <i class="bi bi-mortarboard me-1"></i> Guru
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="card-body p-3 d-flex flex-column">
+                                <h6 class="fw-bold text-dark mb-1"><?= htmlspecialchars($g['nama']); ?></h6>
+                                <small class="text-primary fw-semibold mb-2 d-block"><?= htmlspecialchars($g['jabatan']); ?></small>
+                                <p class="text-secondary small mb-0 flex-grow-1" style="display:-webkit-box;line-clamp:3;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">
+                                    <?= htmlspecialchars($g['deskripsi'] ?? 'Pendidik berdedikasi SMKS Prasetya Makassar.'); ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else : ?>
+                <div class="col-12 text-center py-5 text-muted">
+                    <i class="bi bi-people fs-1 text-secondary d-block mb-2"></i>
+                    <p>Data guru dan tenaga kependidikan belum tersedia.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <div class="text-center mt-4 pt-2">
+            <a href="guru.php" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                Lihat Seluruh Guru & Tenaga Kependidikan <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Fasilitas Sekolah -->
+<section class="py-5 bg-light border-top" id="fasilitas">
+    <div class="container py-4">
+
+        <div class="section-title text-center">
+            <span class="text-primary fw-semibold small text-uppercase">
+                Sarana & Prasarana
+            </span>
+
+            <h2 class="fw-bold">Fasilitas SMKS Prasetya Makassar</h2>
+            <div class="divider"></div>
+
+            <p class="text-muted mt-2">
+                Fasilitas pembelajaran representatif dan sarana praktikum kejuruan standar industri.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <?php if ($q_fasilitas && mysqli_num_rows($q_fasilitas) > 0) : ?>
+                <?php while ($f = mysqli_fetch_assoc($q_fasilitas)) : 
+                    $f_foto = $f['foto'] ?? '';
+                    $f_src = (!empty($f_foto) && file_exists(__DIR__ . '/assets/uploads/' . $f_foto))
+                        ? 'assets/uploads/' . htmlspecialchars($f_foto)
+                        : 'https://placehold.co/600x400?text=' . urlencode($f['nama_fasilitas']);
+
+                    $badge_f_bg = 'bg-primary';
+                    $kat_f_lower = strtolower($f['kategori'] ?? '');
+                    if (strpos($kat_f_lower, 'lab') !== false || strpos($kat_f_lower, 'praktik') !== false) {
+                        $badge_f_bg = 'bg-danger';
+                    } elseif (strpos($kat_f_lower, 'belajar') !== false || strpos($kat_f_lower, 'kelas') !== false || strpos($kat_f_lower, 'pustaka') !== false) {
+                        $badge_f_bg = 'bg-success';
+                    } elseif (strpos($kat_f_lower, 'olahraga') !== false) {
+                        $badge_f_bg = 'bg-warning text-dark';
+                    } elseif (strpos($kat_f_lower, 'penunjang') !== false || strpos($kat_f_lower, 'ibadah') !== false) {
+                        $badge_f_bg = 'bg-info text-white';
+                    }
+                ?>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card card-fasilitas h-100">
+                            <div class="fasilitas-img-wrapper position-relative" style="height: 220px; overflow: hidden; background: #f1f5f9;">
+                                <img src="<?= $f_src; ?>"
+                                     alt="Fasilitas <?= htmlspecialchars($f['nama_fasilitas']); ?> - SMKS Prasetya Makassar"
+                                     class="w-100 h-100 object-fit-cover"
+                                     loading="lazy"
+                                     decoding="async"
+                                     onerror="this.src='https://placehold.co/600x400?text=Fasilitas+Sekolah'">
+                                <span class="position-absolute top-0 end-0 m-3 badge <?= $badge_f_bg; ?> shadow-sm rounded-pill px-3 py-1 small">
+                                    <i class="bi bi-tag-fill me-1"></i> <?= htmlspecialchars($f['kategori'] ?? 'Umum'); ?>
+                                </span>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h5 class="fw-bold text-dark mb-2"><?= htmlspecialchars($f['nama_fasilitas']); ?></h5>
+                                <p class="text-secondary small mb-0 flex-grow-1" style="display:-webkit-box;line-clamp:3;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.7;">
+                                    <?= htmlspecialchars($f['deskripsi'] ?? 'Fasilitas sarana prasarana SMKS Prasetya Makassar.'); ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else : ?>
+                <div class="col-12 text-center py-5 text-muted">
+                    <i class="bi bi-building fs-1 text-secondary d-block mb-2"></i>
+                    <p>Data fasilitas sekolah belum tersedia.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <div class="text-center mt-4 pt-2">
+            <a href="fasilitas.php" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                Lihat Seluruh Fasilitas Sekolah <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Jejak Alumni Sekolah -->
+<section class="py-5 bg-white border-top" id="alumni">
+    <div class="container py-4">
+
+        <div class="section-title text-center">
+            <span class="text-primary fw-semibold small text-uppercase">
+                Kiprah & Prestasi Lulusan
+            </span>
+
+            <h2 class="fw-bold">Jejak Alumni SMKS Prasetya Makassar</h2>
+            <div class="divider"></div>
+
+            <p class="text-muted mt-2">
+                Membuktikan kompetensi vokasi unggul, siap kerja, wirausaha, dan berdaya saing di industri.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <?php if ($q_alumni && mysqli_num_rows($q_alumni) > 0) : ?>
+                <?php while ($al = mysqli_fetch_assoc($q_alumni)) : 
+                    $al_foto = $al['foto'] ?? '';
+                    $al_src = (!empty($al_foto) && file_exists(__DIR__ . '/assets/uploads/' . $al_foto))
+                        ? 'assets/uploads/' . htmlspecialchars($al_foto)
+                        : 'https://placehold.co/400x500?text=' . urlencode($al['nama']);
+                ?>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card card-alumni h-100 d-flex flex-column">
+                            <div class="position-relative" style="height: 250px; overflow: hidden; background: #f1f5f9;">
+                                <img src="<?= $al_src; ?>"
+                                     alt="Foto Alumni <?= htmlspecialchars($al['nama']); ?> - Lulusan SMKS Prasetya Makassar"
+                                     class="w-100 h-100 object-fit-cover"
+                                     loading="lazy"
+                                     decoding="async"
+                                     onerror="this.src='https://placehold.co/400x500?text=Foto+Alumni'">
+                                <span class="position-absolute top-0 end-0 m-3 badge bg-primary shadow-sm rounded-pill px-3 py-1 small">
+                                    <i class="bi bi-mortarboard-fill me-1"></i> Lulus <?= htmlspecialchars($al['tahun_lulus']); ?>
+                                </span>
+                            </div>
+                            <div class="p-4 d-flex flex-column flex-grow-1">
+                                <h6 class="fw-bold text-dark mb-1"><?= htmlspecialchars($al['nama']); ?></h6>
+                                <span class="text-primary small fw-semibold mb-2 d-block">
+                                    <?= htmlspecialchars($al['jurusan']); ?>
+                                </span>
+                                <div class="p-2 rounded bg-light border-start border-3 border-warning mb-2">
+                                    <small class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Aktivitas / Pekerjaan:</small>
+                                    <small class="text-dark fw-semibold" style="display:-webkit-box;line-clamp:2;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                                        <?= htmlspecialchars($al['pekerjaan']); ?>
+                                    </small>
+                                </div>
+                                <?php if (!empty($al['testimoni'])) : ?>
+                                    <p class="text-secondary small fst-italic mb-0 mt-auto" style="display:-webkit-box;line-clamp:2;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:0.8rem;">
+                                        "<?= htmlspecialchars($al['testimoni']); ?>"
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else : ?>
+                <div class="col-12 text-center py-5 text-muted">
+                    <i class="bi bi-mortarboard fs-1 text-secondary d-block mb-2"></i>
+                    <p>Data alumni sekolah belum tersedia.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <div class="text-center mt-4 pt-2">
+            <a href="alumni.php" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                Lihat Seluruh Jejak Alumni <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- Berita -->
 <section class="py-5 bg-light" id="berita">
     <div class="container py-4">
@@ -586,7 +879,10 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
 
                                 <img
                                     src="assets/uploads/<?= htmlspecialchars($b['gambar'] ?? ''); ?>"
-                                    alt="<?= htmlspecialchars($b['judul'] ?? 'Berita Sekolah'); ?>"
+                                    alt="<?= htmlspecialchars($b['judul'] ?? 'Berita Sekolah'); ?> - SMKS Prasetya Makassar"
+                                    class="w-100 object-fit-cover"
+                                    loading="lazy"
+                                    decoding="async"
                                     onerror="this.src='https://placehold.co/600x400?text=SMKS+Prasetya'">
 
                                 <span class="position-absolute top-0 end-0 bg-primary text-white small px-3 py-1 m-3 rounded-pill shadow-sm">
@@ -666,7 +962,10 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
 
                             <img
                                 src="assets/uploads/<?= htmlspecialchars($g['nama_file']); ?>"
-                                alt="<?= htmlspecialchars($g['judul']); ?>"
+                                alt="Dokumentasi <?= htmlspecialchars($g['judul']); ?> - SMKS Prasetya Makassar"
+                                class="w-100"
+                                loading="lazy"
+                                decoding="async"
                                 onerror="this.src='https://placehold.co/600x400?text=Galeri+Sekolah'">
 
                             <div class="card-body p-3">
@@ -960,6 +1259,18 @@ $q_galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6")
 
                     <li class="mb-2">
                         <a href="#jurusan" class="text-white-50 text-decoration-none">Program Keahlian</a>
+                    </li>
+
+                    <li class="mb-2">
+                        <a href="guru.php" class="text-white-50 text-decoration-none">Guru & Tendik</a>
+                    </li>
+
+                    <li class="mb-2">
+                        <a href="fasilitas.php" class="text-white-50 text-decoration-none">Fasilitas Sekolah</a>
+                    </li>
+
+                    <li class="mb-2">
+                        <a href="alumni.php" class="text-white-50 text-decoration-none">Alumni</a>
                     </li>
 
                     <li class="mb-2">

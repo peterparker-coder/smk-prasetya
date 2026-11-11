@@ -253,6 +253,24 @@ $logo = $base_admin . "../assets/uploads/logo-smks-prasetya.png";
             <span>Data Jurusan</span>
         </a>
 
+        <a href="<?= $base_admin; ?>guru/index.php"
+           class="<?= (isset($active_menu) && $active_menu == 'guru') ? 'active' : ''; ?>">
+            <i class="bi bi-people"></i>
+            <span>Guru & Tenaga Kependidikan</span>
+        </a>
+
+        <a href="<?= $base_admin; ?>fasilitas/index.php"
+           class="<?= (isset($active_menu) && $active_menu == 'fasilitas') ? 'active' : ''; ?>">
+            <i class="bi bi-building"></i>
+            <span>Fasilitas Sekolah</span>
+        </a>
+
+        <a href="<?= $base_admin; ?>alumni/index.php"
+           class="<?= (isset($active_menu) && $active_menu == 'alumni') ? 'active' : ''; ?>">
+            <i class="bi bi-mortarboard"></i>
+            <span>Data Alumni</span>
+        </a>
+
         <a href="<?= $base_admin; ?>berita/index.php"
            class="<?= (isset($active_menu) && $active_menu == 'berita') ? 'active' : ''; ?>">
             <i class="bi bi-newspaper"></i>

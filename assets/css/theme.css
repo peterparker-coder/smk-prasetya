@@ -25,7 +25,10 @@ html[data-theme="dark"] .card,
 html[data-theme="dark"] .info-card,
 html[data-theme="dark"] .card-jurusan,
 html[data-theme="dark"] .card-berita,
-html[data-theme="dark"] .card-galeri {
+html[data-theme="dark"] .card-galeri,
+html[data-theme="dark"] .card-guru,
+html[data-theme="dark"] .card-fasilitas,
+html[data-theme="dark"] .card-alumni {
     background-color: #1f2937 !important;
     color: #e5e7eb !important;
 }
